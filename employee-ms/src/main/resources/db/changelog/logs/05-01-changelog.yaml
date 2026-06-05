@@ -1,0 +1,102 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1780658361126-1
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_employees
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: fin_code
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: full_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: role
+                  type: VARCHAR(255)
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+            tableName: employees
+  - changeSet:
+      id: 1780658361126-2
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_refresh-tokens
+                  name: id
+                  type: UUID
+              - column:
+                  name: employee_id
+                  type: UUID
+              - column:
+                  name: refresh_token
+                  type: VARCHAR(255)
+              - column:
+                  name: role
+                  type: VARCHAR(255)
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+            tableName: refresh-tokens
+  - changeSet:
+      id: 1780658361126-3
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: fin_code
+            constraintName: uc_employees_fincode
+            tableName: employees
+  - changeSet:
+      id: 1780658361126-4
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: employee_id
+            constraintName: uc_refresh-tokens_employee
+            tableName: refresh-tokens
+  - changeSet:
+      id: 1780658361126-5
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: employee_id
+            baseTableName: refresh-tokens
+            constraintName: FK_REFRESH-TOKENS_ON_EMPLOYEE
+            referencedColumnNames: id
+            referencedTableName: employees
+
