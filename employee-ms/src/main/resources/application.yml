@@ -24,8 +24,6 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yml
 
-central-bank:
-  url: https://cbar.az/currencies/%s.xml
 
 jwt:
   secret-key: ${SECRET_KEY}

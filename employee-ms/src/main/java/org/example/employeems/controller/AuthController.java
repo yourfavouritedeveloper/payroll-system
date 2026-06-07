@@ -34,7 +34,8 @@ public class AuthController {
     }
 
     @PutMapping("/refresh-token")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestParam String token) {
+    public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("Authorization") String token) {
+        token = token.substring(7);
         return ResponseEntity.ok(employeeService.refresh(token));
     }
 }

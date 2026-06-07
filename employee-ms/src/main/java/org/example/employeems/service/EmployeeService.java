@@ -107,17 +107,21 @@ public class EmployeeService {
     @Transactional
     public AuthResponse refresh(String token) {
 
-        RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(token)
+        String finCode = jwtService.extractUsername(token);
+
+        Employee employee = employeeRepository.findByFinCode(finCode)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+
+        RefreshToken refreshToken = refreshTokenRepository.findByEmployee(employee)
                 .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token not found"));
 
 
-        Employee employee = refreshToken.getEmployee();
-
-        if (!jwtService.validateToken(token, employee)) {
+        if (!jwtService.validateToken(refreshToken.getRefreshToken(), employee)) {
             throw new InvalidValidationException("Invalid token");
         }
 
         refreshTokenRepository.delete(refreshToken);
+        refreshTokenRepository.flush();
 
         String newAccessToken = jwtService.generateAccessToken(employee);
         String newRefreshToken = jwtService.generateRefreshToken(employee);

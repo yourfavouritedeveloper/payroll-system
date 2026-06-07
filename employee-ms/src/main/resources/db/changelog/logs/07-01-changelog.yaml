@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: employee-ms
+      changes:
+        - insert:
+            tableName: employees
+            columns:
+              - column:
+                  name: id
+                  value: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+
+              - column:
+                  name: fin_code
+                  value: AZE12345
+
+              - column:
+                  name: full_name
+                  value: Nihad Mammadov
+
+              - column:
+                  name: password
+                  value: $2a$10$nihad123
+
+              - column:
+                  name: role
+                  value: ADMIN
+
+              - column:
+                  name: created_at
+                  valueDate: now()
+
+              - column:
+                  name: updated_at
+                  valueDate: now()
