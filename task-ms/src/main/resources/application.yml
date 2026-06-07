@@ -1,0 +1,33 @@
+server:
+  port: ${SERVER_PORT}
+
+spring:
+  application:
+    name: task-ms
+
+  profiles:
+    active: local
+
+  #  data:
+  #    redis:
+  #      repositories:
+  #        enabled: false
+  #      host: localhost
+  #      port: 6380
+
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yml
+
+
+jwt:
+  secret-key: ${SECRET_KEY}
+  access-expiration: ${ACCESS_EXPIRATION}
+  refresh-expiration: ${REFRESH_EXPIRATION}
+
+
