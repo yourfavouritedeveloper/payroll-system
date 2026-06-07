@@ -20,11 +20,15 @@ databaseChangeLog:
 
               - column:
                   name: password
-                  value: $2a$10$nihad123
+                  value: $2a$10$OwYi6jIp6AD7eLMN44sCueETWRe2Ixyd/dsX9EnIIPd54iU6EU/Am
 
               - column:
                   name: role
                   value: ADMIN
+
+              - column:
+                  name: official_salary
+                  valueNumeric: 1000
 
               - column:
                   name: created_at

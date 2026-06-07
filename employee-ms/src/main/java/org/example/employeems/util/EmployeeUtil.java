@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.employeems.dto.request.RegisterRequest;
+import org.example.employeems.dto.response.EmployeeResponse;
 import org.example.employeems.entity.Employee;
 import org.example.employeems.enumeration.Role;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,16 @@ public class EmployeeUtil {
                 .finCode(registerRequest.getFinCode())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .fullName(registerRequest.getFullName())
+                .role(Role.USER)
+                .officialSalary(registerRequest.getOfficialSalary())
+                .build();
+    }
+
+    public EmployeeResponse toEmployeeResponse(Employee employee) {
+        return EmployeeResponse.builder()
+                .id(employee.getId())
+                .finCode(employee.getFinCode())
+                .fullName(employee.getFullName())
                 .role(Role.USER)
                 .build();
     }
