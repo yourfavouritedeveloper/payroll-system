@@ -11,6 +11,8 @@ public class EmployeeMsApplication {
 
     public static void main(String[] args) {
 
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        System.out.println(encoder.encode("Nihad123!"));
 
         SpringApplication.run(EmployeeMsApplication.class, args);
     }

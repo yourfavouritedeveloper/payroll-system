@@ -7,6 +7,7 @@ import org.example.employeems.config.JwtService;
 import org.example.employeems.dto.request.LoginRequest;
 import org.example.employeems.dto.request.RegisterRequest;
 import org.example.employeems.dto.response.AuthResponse;
+import org.example.employeems.dto.response.EmployeeResponse;
 import org.example.employeems.entity.Employee;
 import org.example.employeems.entity.RefreshToken;
 import org.example.employeems.exception.EmployeeNotFoundException;
@@ -140,6 +141,15 @@ public class EmployeeService {
                 .build();
 
 
+    }
+
+
+    @Transactional
+    public EmployeeResponse findByFinCode(String finCode) {
+        Employee employee = employeeRepository.findByFinCode(finCode)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+
+        return employeeUtil.toEmployeeResponse(employee);
     }
 
 

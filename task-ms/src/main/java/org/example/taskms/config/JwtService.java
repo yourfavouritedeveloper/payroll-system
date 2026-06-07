@@ -1,4 +1,4 @@
-package org.example.employeems.config;
+package org.example.taskms.config;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -65,6 +65,11 @@ public class    JwtService {
         Claims claims = extractClaims(token);
         return claims.getExpiration();
     }
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

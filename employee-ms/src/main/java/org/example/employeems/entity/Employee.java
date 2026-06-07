@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -39,6 +40,11 @@ public class Employee implements UserDetails {
     String password;
 
     @Column(nullable = false)
+    BigDecimal officialSalary;
+
+    BigDecimal salaryPerTask;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     Role role;
 
@@ -47,6 +53,14 @@ public class Employee implements UserDetails {
 
     @UpdateTimestamp
     Timestamp updatedAt;
+
+    @PostLoad
+    @PrePersist
+    public void calculateSalaryPerTask() {
+        if (officialSalary != null) {
+            this.salaryPerTask = officialSalary.divide(BigDecimal.valueOf(20));
+        }
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
