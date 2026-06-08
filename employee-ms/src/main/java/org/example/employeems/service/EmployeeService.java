@@ -3,10 +3,12 @@ package org.example.employeems.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.employeems.client.SalaryClient;
 import org.example.employeems.config.JwtService;
 import org.example.employeems.dto.request.LoginRequest;
 import org.example.employeems.dto.request.RegisterRequest;
 import org.example.employeems.dto.response.AuthResponse;
+import org.example.employeems.dto.response.CalculatedSalaryResponse;
 import org.example.employeems.dto.response.EmployeeResponse;
 import org.example.employeems.entity.Employee;
 import org.example.employeems.entity.RefreshToken;
@@ -31,6 +33,7 @@ public class EmployeeService {
     RefreshTokenRepository refreshTokenRepository;
     JwtService jwtService;
     PasswordEncoder passwordEncoder;
+    SalaryClient salaryClient;
     EmployeeUtil employeeUtil;
 
 
@@ -38,6 +41,9 @@ public class EmployeeService {
     public AuthResponse register(RegisterRequest registerRequest) {
         Employee employee = employeeUtil.toEmployee(registerRequest);
         employeeRepository.save(employee);
+        employeeRepository.flush();
+
+        salaryClient.createSalaryCalculator(employee.getId());
 
         String accessToken = jwtService.generateAccessToken(employee);
         String refreshToken = jwtService.generateRefreshToken(employee);
@@ -144,7 +150,7 @@ public class EmployeeService {
     }
 
 
-    @Transactional
+    @Transactional(readOnly = true)
     public EmployeeResponse findByFinCode(String finCode) {
         Employee employee = employeeRepository.findByFinCode(finCode)
                 .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));

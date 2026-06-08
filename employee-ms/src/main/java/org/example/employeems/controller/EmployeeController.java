@@ -20,7 +20,7 @@ public class EmployeeController {
     EmployeeService employeeService;
 
     @GetMapping("/{finCode}")
-    public ResponseEntity<EmployeeResponse> getEmployeeByFinCode(@PathVariable String finCode) {
+    public ResponseEntity<EmployeeResponse> findByFinCode(@PathVariable String finCode) {
         return ResponseEntity.ok(employeeService.findByFinCode(finCode));
     }
 

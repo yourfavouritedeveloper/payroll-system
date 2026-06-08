@@ -31,3 +31,6 @@ jwt:
   refresh-expiration: ${REFRESH_EXPIRATION}
 
 
+salary:
+  service:
+    url: http://localhost:8087

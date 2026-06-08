@@ -1,4 +1,4 @@
-package org.example.taskms.config;
+package org.example.salaryms.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

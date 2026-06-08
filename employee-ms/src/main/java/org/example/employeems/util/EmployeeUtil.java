@@ -34,6 +34,7 @@ public class EmployeeUtil {
                 .finCode(employee.getFinCode())
                 .fullName(employee.getFullName())
                 .role(Role.USER)
+                .salaryPerTask(employee.getSalaryPerTask())
                 .build();
     }
 }

@@ -7,6 +7,7 @@ import org.example.taskms.dto.request.TaskRequest;
 import org.example.taskms.dto.response.TaskResponse;
 import org.example.taskms.service.TaskService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -19,12 +20,10 @@ public class AdminTaskController {
 
     TaskService taskService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskResponse> findTaskById(@PathVariable UUID id) {
-        return ResponseEntity.ok(taskService.findById(id));
-    }
+
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest) {
         return ResponseEntity.ok(taskService.createTask(taskRequest));
     }

@@ -18,6 +18,22 @@ public class GlobalExceptionHandler {
         return buildResponse(e.getMessage(), 404);
     }
 
+    @ExceptionHandler(EmployeeNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEmployeeNotFoundException(EmployeeNotFoundException e) {
+        return buildResponse(e.getMessage(), 404);
+    }
+
+    @ExceptionHandler(CredentialsDontMatchException.class)
+    public ResponseEntity<ErrorResponse> handleCredentialsDontMatchException(CredentialsDontMatchException e) {
+        return buildResponse(e.getMessage(), 404);
+    }
+
+    @ExceptionHandler(TaskLimitReachedException.class)
+    public ResponseEntity<ErrorResponse> handleTaskLimitReachedException(TaskLimitReachedException e) {
+        return buildResponse(e.getMessage(), 404);
+    }
+
+
 
     private ResponseEntity<ErrorResponse> buildResponse(String message, int status) {
         return ResponseEntity

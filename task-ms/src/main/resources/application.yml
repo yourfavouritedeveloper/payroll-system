@@ -31,3 +31,10 @@ jwt:
   refresh-expiration: ${REFRESH_EXPIRATION}
 
 
+employee:
+  service:
+    url: http://localhost:8085
+
+salary:
+  service:
+    url: http://localhost:8087

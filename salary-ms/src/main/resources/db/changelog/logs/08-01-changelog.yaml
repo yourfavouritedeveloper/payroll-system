@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1780874748661-1
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_calculated_salaries
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: employee_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: calculated_salary
+                  type: DECIMAL
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+            tableName: calculated_salaries
+  - changeSet:
+      id: 1780874748661-2
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_salaries
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: employee_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: salary
+                  type: DECIMAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: payment_date
+                  type: DATETIME
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+            tableName: salaries
+  - changeSet:
+      id: 1780874748661-3
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: employee_id
+            constraintName: uc_calculated_salaries_employeeid
+            tableName: calculated_salaries
+
