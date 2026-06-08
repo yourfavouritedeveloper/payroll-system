@@ -7,6 +7,7 @@ import org.example.taskms.client.EmployeeClient;
 import org.example.taskms.dto.response.EmployeeResponse;
 import org.example.taskms.dto.response.TaskResponse;
 import org.example.taskms.entity.Task;
+import org.example.taskms.enumeration.Role;
 import org.example.taskms.exception.EmployeeNotFoundException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -41,7 +42,7 @@ public class TaskUtil {
     public Boolean isValid (String finCode, UUID id) {
         EmployeeResponse employeeResponse = employeeClient.findByFinCode(finCode);
 
-        return employeeResponse.getId().equals(id);
+        return employeeResponse.getId().equals(id) || employeeResponse.getRole() == Role.ADMIN;
     }
 
 }

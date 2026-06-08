@@ -25,9 +25,24 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yml
 
 
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: salaryGroup
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+
+
 jwt:
   secret-key: ${SECRET_KEY}
   access-expiration: ${ACCESS_EXPIRATION}
   refresh-expiration: ${REFRESH_EXPIRATION}
 
 
+kafka:
+  topics:
+    employee: employee.created
+    task: task.completed

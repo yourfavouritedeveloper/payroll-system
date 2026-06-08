@@ -24,6 +24,12 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yml
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 
 jwt:
   secret-key: ${SECRET_KEY}
@@ -35,6 +41,8 @@ employee:
   service:
     url: http://localhost:8085
 
-salary:
-  service:
-    url: http://localhost:8087
+
+
+kafka:
+  topics:
+    task: task.completed
