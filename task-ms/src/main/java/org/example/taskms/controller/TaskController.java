@@ -1,5 +1,6 @@
 package org.example.taskms.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,7 +44,7 @@ public class TaskController {
 
     @PutMapping("/{id}/finish")
     public ResponseEntity<TaskResponse> finishTask(@RequestHeader("Authorization") String token,
-                                                   @PathVariable UUID id) {
+                                                   @PathVariable UUID id) throws JsonProcessingException {
         return ResponseEntity.ok(taskService.finishTask(jwtService.extractUsername(token.substring(7)),id));
     }
 

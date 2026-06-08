@@ -1,17 +1,21 @@
 package org.example.taskms.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.taskms.client.EmployeeClient;
-import org.example.taskms.client.SalaryClient;
 import org.example.taskms.dto.request.TaskRequest;
-import org.example.taskms.dto.response.CalculatedSalaryResponse;
 import org.example.taskms.dto.response.EmployeeResponse;
+import org.example.taskms.dto.response.SalaryEventResponse;
 import org.example.taskms.dto.response.TaskResponse;
+import org.example.taskms.entity.OutboxEvent;
 import org.example.taskms.entity.Task;
+import org.example.taskms.enumeration.OutboxStatus;
 import org.example.taskms.enumeration.Status;
 import org.example.taskms.exception.*;
+import org.example.taskms.repository.OutboxEventRepository;
 import org.example.taskms.repository.TaskRepository;
 import org.example.taskms.util.TaskUtil;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,8 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +34,8 @@ public class TaskService {
     TaskRepository taskRepository;
     TaskUtil taskUtil;
     EmployeeClient employeeClient;
-    SalaryClient salaryClient;
+    ObjectMapper objectMapper;
+    OutboxEventRepository outboxEventRepository;
 
     @Transactional(readOnly = true)
     public TaskResponse findById(String finCode, UUID id) {
@@ -108,7 +111,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponse finishTask(String finCode, UUID id) {
+    public TaskResponse finishTask(String finCode, UUID id) throws JsonProcessingException {
 
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task with the id " + id + " not found"));
@@ -119,6 +122,8 @@ public class TaskService {
 
         if(task.getStatus() == Status.DONE) {
             throw new InvalidTaskStatusException("Task has already been finished");
+        } else if(task.getStatus() != Status.IN_PROGRESS) {
+            throw new InvalidTaskStatusException("You need to start a task first to finish it");
         }
 
 
@@ -131,7 +136,20 @@ public class TaskService {
         BigDecimal calculatedSalary = employeeResponse.getSalaryPerTask()
                 .multiply(task.getSeverity());
 
-        salaryClient.updateCalculatedSalary(employeeResponse.getId(),calculatedSalary);
+
+        SalaryEventResponse salaryEventResponse = SalaryEventResponse.builder()
+                .calculatedSalary(calculatedSalary)
+                .employeeId(task.getEmployeeId())
+                .build();
+
+        OutboxEvent event = OutboxEvent.builder()
+                .topic("task.completed")
+                .key(task.getId().toString())
+                .value(objectMapper.writeValueAsString(salaryEventResponse))
+                .status(OutboxStatus.PENDING)
+                .build();
+        outboxEventRepository.save(event);
+
 
 
         return taskUtil.toTaskResponse(task);

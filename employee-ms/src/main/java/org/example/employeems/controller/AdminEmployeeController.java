@@ -1,6 +1,7 @@
 package org.example.employeems.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class AdminEmployeeController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) throws JsonProcessingException {
         return ResponseEntity.ok(employeeService.register(registerRequest));
     }
 }

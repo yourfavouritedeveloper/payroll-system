@@ -1,22 +1,25 @@
 package org.example.employeems.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.example.employeems.client.SalaryClient;
 import org.example.employeems.config.JwtService;
 import org.example.employeems.dto.request.LoginRequest;
 import org.example.employeems.dto.request.RegisterRequest;
 import org.example.employeems.dto.response.AuthResponse;
-import org.example.employeems.dto.response.CalculatedSalaryResponse;
 import org.example.employeems.dto.response.EmployeeResponse;
 import org.example.employeems.entity.Employee;
+import org.example.employeems.entity.OutboxEvent;
 import org.example.employeems.entity.RefreshToken;
+import org.example.employeems.enumeration.OutboxStatus;
 import org.example.employeems.exception.EmployeeNotFoundException;
 import org.example.employeems.exception.InvalidValidationException;
 import org.example.employeems.exception.PasswordDoesNotMatchException;
 import org.example.employeems.exception.RefreshTokenNotFoundException;
 import org.example.employeems.repository.EmployeeRepository;
+import org.example.employeems.repository.OutboxEventRepository;
 import org.example.employeems.repository.RefreshTokenRepository;
 import org.example.employeems.util.EmployeeUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,17 +36,26 @@ public class EmployeeService {
     RefreshTokenRepository refreshTokenRepository;
     JwtService jwtService;
     PasswordEncoder passwordEncoder;
-    SalaryClient salaryClient;
     EmployeeUtil employeeUtil;
+    ObjectMapper objectMapper;
+    OutboxEventRepository outboxEventRepository;
 
 
     @Transactional
-    public AuthResponse register(RegisterRequest registerRequest) {
+    public AuthResponse register(RegisterRequest registerRequest) throws JsonProcessingException {
         Employee employee = employeeUtil.toEmployee(registerRequest);
         employeeRepository.save(employee);
         employeeRepository.flush();
 
-        salaryClient.createSalaryCalculator(employee.getId());
+        EmployeeResponse employeeResponse = employeeUtil.toEmployeeResponse(employee);
+
+        OutboxEvent event = OutboxEvent.builder()
+                .topic("employee.created")
+                .key(employee.getId().toString())
+                .value(objectMapper.writeValueAsString(employeeResponse))
+                .status(OutboxStatus.PENDING)
+                .build();
+        outboxEventRepository.save(event);
 
         String accessToken = jwtService.generateAccessToken(employee);
         String refreshToken = jwtService.generateRefreshToken(employee);

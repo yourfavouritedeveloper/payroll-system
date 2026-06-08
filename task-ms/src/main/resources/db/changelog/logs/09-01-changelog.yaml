@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1780953687993-1
+      author: HP
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_outbox_events
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: topic
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: key
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: value
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+            tableName: outbox_events
+
