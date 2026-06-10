@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: employee-ms
+              uri: http://localhost:8085
+              predicates:
+                - Path=/employee-ms/**
+              filters:
+                - StripPrefix=1
+            - id: task-ms
+              uri: http://localhost:8086
+              predicates:
+                - Path=/task-ms/**
+              filters:
+                - StripPrefix=1
+            - id: salary-ms
+              uri: http://localhost:8087
+              predicates:
+                - Path=/salary-ms/**
+              filters:
+                - StripPrefix=1
+
+server:
+  port: 8765
