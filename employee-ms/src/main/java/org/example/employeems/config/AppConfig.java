@@ -1,7 +1,7 @@
 package org.example.employeems.config;
 
 import lombok.RequiredArgsConstructor;
-import org.example.employeems.repository.EmployeeRepository;
+import org.example.employeems.repository.jpa.EmployeeRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

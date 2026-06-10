@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/employee")
 @RequiredArgsConstructor
@@ -19,9 +21,15 @@ public class EmployeeController {
 
     EmployeeService employeeService;
 
-    @GetMapping("/{finCode}")
+    @GetMapping("/fin/{finCode}")
     public ResponseEntity<EmployeeResponse> findByFinCode(@PathVariable String finCode) {
         return ResponseEntity.ok(employeeService.findByFinCode(finCode));
     }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<EmployeeResponse> findById(@PathVariable UUID id) {
+        return ResponseEntity.ok(employeeService.findById(id));
+    }
+
 
 }

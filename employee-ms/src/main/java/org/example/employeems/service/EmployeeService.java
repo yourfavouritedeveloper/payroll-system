@@ -18,13 +18,17 @@ import org.example.employeems.exception.EmployeeNotFoundException;
 import org.example.employeems.exception.InvalidValidationException;
 import org.example.employeems.exception.PasswordDoesNotMatchException;
 import org.example.employeems.exception.RefreshTokenNotFoundException;
-import org.example.employeems.repository.EmployeeRepository;
-import org.example.employeems.repository.OutboxEventRepository;
-import org.example.employeems.repository.RefreshTokenRepository;
+import org.example.employeems.repository.jpa.EmployeeRepository;
+import org.example.employeems.repository.jpa.OutboxEventRepository;
+import org.example.employeems.repository.jpa.RefreshTokenRepository;
+import org.example.employeems.repository.redis.EmployeeRedisRepository;
 import org.example.employeems.util.EmployeeUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 
 @Service
@@ -33,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeService {
 
     EmployeeRepository employeeRepository;
+    EmployeeRedisRepository employeeRedisRepository;
     RefreshTokenRepository refreshTokenRepository;
     JwtService jwtService;
     PasswordEncoder passwordEncoder;
@@ -45,6 +50,7 @@ public class EmployeeService {
     public AuthResponse register(RegisterRequest registerRequest) throws JsonProcessingException {
         Employee employee = employeeUtil.toEmployee(registerRequest);
         employeeRepository.save(employee);
+        employeeRedisRepository.save(employee);
         employeeRepository.flush();
 
         EmployeeResponse employeeResponse = employeeUtil.toEmployeeResponse(employee);
@@ -57,48 +63,23 @@ public class EmployeeService {
                 .build();
         outboxEventRepository.save(event);
 
-        String accessToken = jwtService.generateAccessToken(employee);
-        String refreshToken = jwtService.generateRefreshToken(employee);
+        return employeeUtil.returnToken(employee);
 
-        RefreshToken token = RefreshToken.builder()
-                .refreshToken(refreshToken)
-                .employee(employee)
-                .role(employee.getRole())
-                .build();
-
-        refreshTokenRepository.save(token);
-
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
     }
 
     @Transactional
     public AuthResponse authenticate(LoginRequest loginRequest) {
-        Employee employee = (Employee) employeeRepository.findByFinCode(loginRequest.getFinCode())
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee with given fin code does not exist"));
+
+        Employee employee = employeeRedisRepository.findByFinCode(loginRequest.getFinCode())
+                .orElseGet(() -> employeeRepository.findByFinCode(loginRequest.getFinCode())
+                        .orElseThrow(() -> new EmployeeNotFoundException("Employee with given fin code does not exist")));
 
         if(!passwordEncoder.matches(loginRequest.getPassword(), employee.getPassword())) {
             throw new PasswordDoesNotMatchException("Password does not match");
         }
 
 
-        String accessToken = jwtService.generateAccessToken(employee);
-        String refreshToken = jwtService.generateRefreshToken(employee);
-
-        RefreshToken token = RefreshToken.builder()
-                .refreshToken(refreshToken)
-                .employee(employee)
-                .role(employee.getRole())
-                .build();
-
-        refreshTokenRepository.save(token);
-
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return employeeUtil.returnToken(employee);
     }
 
 
@@ -107,8 +88,9 @@ public class EmployeeService {
 
         String finCode = jwtService.extractUsername(token);
 
-        Employee employee = employeeRepository.findByFinCode(finCode)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+        Employee employee = employeeRedisRepository.findByFinCode(finCode)
+                .orElseGet(() -> employeeRepository.findByFinCode(finCode)
+                        .orElseThrow(() -> new EmployeeNotFoundException("Employee with given fin code does not exist")));
 
         if (!jwtService.validateToken(token, employee)) {
             throw new InvalidValidationException("Invalid token");
@@ -122,14 +104,28 @@ public class EmployeeService {
 
     }
 
+    @Transactional
+    public EmployeeResponse updateBalance(UUID id, BigDecimal newBalance) {
+        Employee employee = employeeRedisRepository.findById(id)
+                .orElseGet(() -> employeeRepository.findById(id)
+                        .orElseThrow(() -> new EmployeeNotFoundException("Employee with given fin code does not exist")));
+
+
+        employee.setBalance(newBalance);
+        employeeRepository.save(employee);
+        employeeRedisRepository.save(employee);
+        return employeeUtil.toEmployeeResponse(employee);
+    }
+
 
     @Transactional
     public AuthResponse refresh(String token) {
 
         String finCode = jwtService.extractUsername(token);
 
-        Employee employee = employeeRepository.findByFinCode(finCode)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+        Employee employee = employeeRedisRepository.findByFinCode(finCode)
+                .orElseGet(() -> employeeRepository.findByFinCode(finCode)
+                        .orElseThrow(() -> new EmployeeNotFoundException("Employee with given fin code does not exist")));
 
         RefreshToken refreshToken = refreshTokenRepository.findByEmployee(employee)
                 .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token not found"));
@@ -142,21 +138,7 @@ public class EmployeeService {
         refreshTokenRepository.delete(refreshToken);
         refreshTokenRepository.flush();
 
-        String newAccessToken = jwtService.generateAccessToken(employee);
-        String newRefreshToken = jwtService.generateRefreshToken(employee);
-
-        RefreshToken newToken = RefreshToken.builder()
-                .refreshToken(newRefreshToken)
-                .employee(employee)
-                .role(employee.getRole())
-                .build();
-
-        refreshTokenRepository.save(newToken);
-
-        return AuthResponse.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken)
-                .build();
+        return employeeUtil.returnToken(employee);
 
 
     }
@@ -164,10 +146,21 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public EmployeeResponse findByFinCode(String finCode) {
-        Employee employee = employeeRepository.findByFinCode(finCode)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+        Employee employee = employeeRedisRepository.findByFinCode(finCode)
+                .orElseGet(() -> employeeRepository.findByFinCode(finCode)
+                        .orElseThrow(() -> new EmployeeNotFoundException("Employee with given fin code does not exist")));
 
         return employeeUtil.toEmployeeResponse(employee);
+    }
+
+    @Transactional(readOnly = true)
+    public EmployeeResponse findById(UUID id) {
+        Employee employee = employeeRedisRepository.findById(id)
+                .orElseGet(() -> employeeRepository.findById(id)
+                        .orElseThrow(() -> new EmployeeNotFoundException("Employee with given id does not exist")));
+
+        return employeeUtil.toEmployeeResponse(employee);
+
     }
 
 

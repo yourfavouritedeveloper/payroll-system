@@ -48,6 +48,9 @@ public class Employee implements UserDetails {
     @Enumerated(EnumType.STRING)
     Role role;
 
+    @Builder.Default
+    BigDecimal balance = BigDecimal.ZERO;
+
     @CreationTimestamp
     Timestamp createdAt;
 

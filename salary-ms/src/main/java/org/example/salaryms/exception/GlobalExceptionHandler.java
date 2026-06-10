@@ -13,8 +13,18 @@ public class GlobalExceptionHandler {
         return buildResponse(e.getMessage(), 404);
     }
 
+    @ExceptionHandler(CredentialsDontMatchException.class)
+    public ResponseEntity<ErrorResponse> handleCredentialsDontMatchException(CredentialsDontMatchException e) {
+        return buildResponse(e.getMessage(), 404);
+    }
+
     @ExceptionHandler(InsufficientSalaryException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientSalaryException(InsufficientSalaryException e) {
+        return buildResponse(e.getMessage(), 404);
+    }
+
+    @ExceptionHandler(SalaryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSalaryNotFoundException(SalaryNotFoundException e) {
         return buildResponse(e.getMessage(), 404);
     }
 

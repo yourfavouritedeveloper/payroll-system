@@ -1,7 +1,6 @@
-package org.example.taskms.repository;
+package org.example.taskms.repository.jpa;
 
 import org.example.taskms.entity.Task;
-import org.example.taskms.enumeration.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -15,8 +15,9 @@ import org.example.taskms.entity.Task;
 import org.example.taskms.enumeration.OutboxStatus;
 import org.example.taskms.enumeration.Status;
 import org.example.taskms.exception.*;
-import org.example.taskms.repository.OutboxEventRepository;
-import org.example.taskms.repository.TaskRepository;
+import org.example.taskms.repository.jpa.OutboxEventRepository;
+import org.example.taskms.repository.jpa.TaskRepository;
+import org.example.taskms.repository.redis.TaskRedisRepository;
 import org.example.taskms.util.TaskUtil;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import java.util.UUID;
 public class TaskService {
 
     TaskRepository taskRepository;
+    TaskRedisRepository taskRedisRepository;
     TaskUtil taskUtil;
     EmployeeClient employeeClient;
     ObjectMapper objectMapper;
@@ -40,8 +42,10 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskResponse findById(String finCode, UUID id) {
 
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException("Task with the id " + id + " not found"));
+        Task task = taskRedisRepository.findById(id).orElseGet(
+                () -> taskRepository.findById(id)
+                        .orElseThrow(() -> new TaskNotFoundException("Task with the id " + id + " not found")));
+
 
         if(!taskUtil.isValid(finCode, task.getEmployeeId())) {
             throw new CredentialsDontMatchException("Invalid credentials");
@@ -53,7 +57,8 @@ public class TaskService {
     @Transactional(readOnly = true)
     public List<TaskResponse> findByEmployeeId(String finCode, UUID employeeId, Status status) {
 
-        List<Task> tasks = taskRepository.findByEmployeeId(employeeId);
+        List<Task> tasks = taskRedisRepository.findByEmployee(employeeId).orElseGet(
+                () -> taskRepository.findByEmployeeId(employeeId));
 
         if(!taskUtil.isValid(finCode, employeeId)) {
             throw new CredentialsDontMatchException("Invalid credentials");
@@ -87,6 +92,7 @@ public class TaskService {
                 .build();
 
         task = taskRepository.save(task);
+        taskRedisRepository.save(task);
         taskRepository.flush();
         return taskUtil.toTaskResponse(task);
     }
@@ -107,6 +113,7 @@ public class TaskService {
 
         task.setStatus(Status.IN_PROGRESS);
         task = taskRepository.save(task);
+        taskRedisRepository.save(task);
         return taskUtil.toTaskResponse(task);
     }
 
@@ -129,6 +136,7 @@ public class TaskService {
 
         task.setStatus(Status.DONE);
         taskRepository.save(task);
+        taskRedisRepository.save(task);
         taskRepository.flush();
 
         EmployeeResponse employeeResponse = employeeClient.findByFinCode(finCode);
@@ -164,6 +172,7 @@ public class TaskService {
             throw new CredentialsDontMatchException("Invalid credentials");
         }
 
+        taskRedisRepository.delete(task.getId());
         taskRepository.delete(task);
     }
 
@@ -171,7 +180,7 @@ public class TaskService {
 
     @Scheduled(cron = "0 0 19 */30 * *")
     public void deleteTasks() {
-        List<Task> tasks = taskRepository.findAll();
+        List<Task> tasks = taskRedisRepository.findAll();
         tasks.stream()
                 .filter(task -> task.getStatus() == Status.DONE)
                 .forEach(taskRepository::delete);

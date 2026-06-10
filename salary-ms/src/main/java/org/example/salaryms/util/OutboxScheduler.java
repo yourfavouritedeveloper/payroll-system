@@ -1,13 +1,13 @@
-package org.example.employeems.util;
+package org.example.salaryms.util;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.example.employeems.entity.OutboxEvent;
-import org.example.employeems.enumeration.OutboxStatus;
-import org.example.employeems.kafka.KafkaProducer;
-import org.example.employeems.repository.jpa.OutboxEventRepository;
+import org.example.salaryms.entity.OutboxEvent;
+import org.example.salaryms.enumeration.OutboxStatus;
+import org.example.salaryms.kafka.KafkaProducer;
+import org.example.salaryms.repository.jpa.OutboxEventRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package org.example.salaryms.repository;
+package org.example.salaryms.repository.jpa;
 
 import org.example.salaryms.entity.CalculatedSalary;
 import org.springframework.data.jpa.repository.JpaRepository;

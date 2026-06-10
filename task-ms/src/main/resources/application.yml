@@ -8,12 +8,12 @@ spring:
   profiles:
     active: local
 
-  #  data:
-  #    redis:
-  #      repositories:
-  #        enabled: false
-  #      host: localhost
-  #      port: 6380
+  data:
+    redis:
+      repositories:
+        enabled: false
+      host: localhost
+      port: 6381
 
   datasource:
     url: ${POSTGRES_URL}
