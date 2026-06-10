@@ -1,4 +1,4 @@
-package org.example.employeems.repository;
+package org.example.employeems.repository.jpa;
 
 import org.example.employeems.entity.OutboxEvent;
 import org.example.employeems.enumeration.OutboxStatus;

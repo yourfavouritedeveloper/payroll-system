@@ -8,12 +8,12 @@ spring:
   profiles:
     active: local
 
-  #  data:
-  #    redis:
-  #      repositories:
-  #        enabled: false
-  #      host: localhost
-  #      port: 6380
+  data:
+    redis:
+      repositories:
+        enabled: false
+      host: localhost
+      port: 6382
 
   datasource:
     url: ${POSTGRES_URL}
@@ -33,6 +33,9 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 
 
@@ -46,3 +49,14 @@ kafka:
   topics:
     employee: employee.created
     task: task.completed
+    salary: salary.payoff
+
+
+employee:
+  service:
+    url: http://localhost:8085
+
+
+bind:
+  pass:
+    key: ${BAND_PASS_KEY}

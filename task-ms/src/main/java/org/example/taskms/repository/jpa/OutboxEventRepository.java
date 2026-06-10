@@ -1,4 +1,4 @@
-package org.example.taskms.repository;
+package org.example.taskms.repository.jpa;
 
 import org.example.taskms.entity.OutboxEvent;
 import org.example.taskms.enumeration.OutboxStatus;

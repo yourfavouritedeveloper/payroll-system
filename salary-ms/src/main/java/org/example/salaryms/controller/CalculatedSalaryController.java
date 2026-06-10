@@ -3,6 +3,7 @@ package org.example.salaryms.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.salaryms.config.JwtService;
 import org.example.salaryms.dto.response.CalculatedSalaryResponse;
 import org.example.salaryms.service.CalculatedSalaryService;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,11 @@ import java.util.UUID;
 public class CalculatedSalaryController {
 
     CalculatedSalaryService calculatedSalaryService;
+    JwtService jwtService;
 
     @PutMapping("/{employeeId}")
-    public ResponseEntity<CalculatedSalaryResponse> updateCalculatedSalary(@PathVariable UUID employeeId, @RequestParam BigDecimal calculatedSalary){
-        return ResponseEntity.ok(calculatedSalaryService.updateCalculatedSalary(employeeId, calculatedSalary));
+    public ResponseEntity<CalculatedSalaryResponse> updateCalculatedSalary(@RequestHeader("Authorization") String token,
+                                                                            @PathVariable UUID employeeId, @RequestParam BigDecimal calculatedSalary){
+        return ResponseEntity.ok(calculatedSalaryService.updateCalculatedSalary(jwtService.extractUsername(token.substring(7)),employeeId, calculatedSalary));
     }
 }

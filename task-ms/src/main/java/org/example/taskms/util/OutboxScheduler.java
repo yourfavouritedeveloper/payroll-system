@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.taskms.entity.OutboxEvent;
 import org.example.taskms.enumeration.OutboxStatus;
 import org.example.taskms.kafka.KafkaProducer;
-import org.example.taskms.repository.OutboxEventRepository;
+import org.example.taskms.repository.jpa.OutboxEventRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
