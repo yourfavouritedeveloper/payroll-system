@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: swagger-ms
+
+server:
+  port: 8090
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Employee Service
+        url: http://localhost:8085/v3/api-docs
+      - name: Task Service
+        url: http://localhost:8086/v3/api-docs
+      - name: Salary Service
+        url: http://localhost:8087/v3/api-docs
