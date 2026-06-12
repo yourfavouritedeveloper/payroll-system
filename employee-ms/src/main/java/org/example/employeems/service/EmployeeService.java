@@ -54,6 +54,7 @@ public class EmployeeService {
         employeeRepository.flush();
 
         EmployeeResponse employeeResponse = employeeUtil.toEmployeeResponse(employee);
+        employeeResponse.setIdempotencyKey(UUID.randomUUID());
 
         OutboxEvent event = OutboxEvent.builder()
                 .topic("employee.created")

@@ -14,6 +14,8 @@ import java.util.UUID;
 @Builder
 public class SalaryEventResponse {
 
+    UUID idempotencyKey;
+
     UUID employeeId;
 
     BigDecimal calculatedSalary;

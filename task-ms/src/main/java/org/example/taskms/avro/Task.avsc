@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "SalaryEventResponse",
+  "namespace": "org.example",
+  "fields": [
+    {
+      "name": "idempotencyKey",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    {
+      "name": "employeeId",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    {
+      "name": "calculatedSalary",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 18,
+        "scale": 2
+      }
+    }
+
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "type": "record",
+  "name": "SalaryResponse",
+  "namespace": "org.example",
+  "fields": [
+    {
+      "name": "idempotencyKey",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    {
+      "name": "id",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    {
+      "name": "employeeId",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    {
+      "name": "salary",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 18,
+        "scale": 2
+      }
+    },
+    {
+      "name": "paymentDate",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-micros"
+      }
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-micros"
+      }
+    },
+    {
+      "name": "updatedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-micros"
+      }
+    }
+
+  ]
+}

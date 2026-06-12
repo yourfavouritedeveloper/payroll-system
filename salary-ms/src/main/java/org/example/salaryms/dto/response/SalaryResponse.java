@@ -17,6 +17,8 @@ import java.util.UUID;
 @Builder
 public class SalaryResponse {
 
+    UUID idempotencyKey;
+
     UUID id;
 
     UUID employeeId;

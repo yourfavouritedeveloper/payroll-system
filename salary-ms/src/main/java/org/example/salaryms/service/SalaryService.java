@@ -98,6 +98,7 @@ public class SalaryService {
             salaryRepository.flush();
 
             SalaryResponse salaryResponse = salaryUtil.toSalaryResponse(salary);
+            salaryResponse.setIdempotencyKey(UUID.randomUUID());
 
             OutboxEvent event = OutboxEvent.builder()
                     .topic("salary.payoff")

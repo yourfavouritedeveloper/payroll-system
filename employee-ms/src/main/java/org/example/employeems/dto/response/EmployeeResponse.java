@@ -1,9 +1,7 @@
 package org.example.employeems.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.example.employeems.enumeration.Role;
 
 import java.math.BigDecimal;
@@ -13,10 +11,12 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EmployeeResponse {
-    private UUID id;
-    private String finCode;
-    private String fullName;
-    private Role role;
-    private BigDecimal salaryPerTask;
+    UUID idempotencyKey;
+    UUID id;
+    String finCode;
+    String fullName;
+    Role role;
+    BigDecimal salaryPerTask;
 }

@@ -25,6 +25,7 @@ public class KafkaConsumer {
     static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
     final ObjectMapper objectMapper;
     final EmployeeService employeeService;
+    final IdempotencyGuard idempotencyGuard;
 
 
 
@@ -33,6 +34,10 @@ public class KafkaConsumer {
     public void consume(String message) throws JsonProcessingException {
         LOGGER.info("Received Message: {}", message);
         SalaryResponse salaryResponse = objectMapper.readValue(message, SalaryResponse.class);
+        if (!idempotencyGuard.tryAcquire(String.valueOf(salaryResponse.getIdempotencyKey()))) {
+            LOGGER.warn("Duplicate event skipped: {}",salaryResponse.getIdempotencyKey());
+            return;
+        }
         employeeService.updateBalance(salaryResponse.getEmployeeId(), salaryResponse.getSalary());
 
     }
