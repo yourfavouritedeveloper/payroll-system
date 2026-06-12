@@ -1,0 +1,34 @@
+{
+  "type": "record",
+  "name": "EmployeeResponse",
+  "namespace": "org.example",
+  "fields": [
+    {
+      "name": "idempotencyKey",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    {
+      "name": "id",
+      "type": { "type": "string", "logicalType": "uuid" }
+    },
+    { "name": "finCode", "type": "string" },
+    { "name": "fullName", "type": "string" },
+    {
+      "name": "role",
+      "type": {
+        "type": "enum",
+        "name": "Role",
+        "symbols": ["USER", "ADMIN"]
+      }
+    },
+    {
+      "name": "salaryPerTask",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 18,
+        "scale": 2
+      }
+    }
+  ]
+}

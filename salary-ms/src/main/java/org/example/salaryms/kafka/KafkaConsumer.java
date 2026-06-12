@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaConsumer {
 
+    final IdempotencyGuard idempotencyGuard;
     static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
     final ObjectMapper objectMapper;
     final CalculatedSalaryService calculatedSalaryService;
@@ -36,6 +37,10 @@ public class KafkaConsumer {
     public void consumeEmployee(String message) throws JsonProcessingException {
         LOGGER.info("Received Message: {}", message);
         EmployeeResponse employeeResponse = objectMapper.readValue(message, EmployeeResponse.class);
+        if (!idempotencyGuard.tryAcquire(String.valueOf(employeeResponse.getIdempotencyKey()))) {
+            LOGGER.warn("Duplicate event skipped: {}",employeeResponse.getIdempotencyKey());
+            return;
+        }
         calculatedSalaryService.createSalaryCalculator(employeeResponse.getId());
     }
 
@@ -44,6 +49,10 @@ public class KafkaConsumer {
     public void consumeTask(String message) throws JsonProcessingException {
         LOGGER.info("Received Message: {}", message);
         SalaryEventResponse salaryEventResponse = objectMapper.readValue(message, SalaryEventResponse.class);
+        if (!idempotencyGuard.tryAcquire(String.valueOf(salaryEventResponse.getIdempotencyKey()))) {
+            LOGGER.warn("Duplicate event skipped: {}",salaryEventResponse.getIdempotencyKey());
+            return;
+        }
         calculatedSalaryService.updateCalculatedSalary(passKey,salaryEventResponse.getEmployeeId(), salaryEventResponse.getCalculatedSalary());
     }
 

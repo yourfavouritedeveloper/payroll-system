@@ -146,6 +146,7 @@ public class TaskService {
 
 
         SalaryEventResponse salaryEventResponse = SalaryEventResponse.builder()
+                .idempotencyKey(UUID.randomUUID())
                 .calculatedSalary(calculatedSalary)
                 .employeeId(task.getEmployeeId())
                 .build();
